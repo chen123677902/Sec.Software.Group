@@ -8,24 +8,28 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#include "config.h"
 
 #define MAXLENGTH 512
 
-int main {
+int main(int argc, char *argv[]) {
   int isParent = 0;
-  int pipe = 0;
+  int piping = 0;
   int pipePos = 0;
-  int unipipe[2];
+  int uniPipe[2];
   int argc1 = 0;
   int argc2 = 0;
   int argNum = 0;
+  char cmdString[MAXLENGTH];
   char c = 'z';	/* scratch char variable */
   
 /* Empty SHASH */
 
-/* Run Setup Config
- * Check return code
-*/
+/* Check and Parse config file */
+if (!checkConfigFile()) {
+	printf("config check failed");
+	return 1;
+}
 
 /* Log */
 
@@ -36,11 +40,11 @@ int main {
 	  
 	  /* Check for pipe */
 	  int i = 0;
-	  while (i < MAXLENGTH && cmdString[i] != '\0' && pipe == 0) {
+	  while (i < MAXLENGTH && cmdString[i] != '\0' && piping == 0) {
 	   if (cmdString[i] ==  '|') {
-	     pipe = 1;
+	     piping = 1;
 	     pipePos = i;
-	     cmdString[i] = '\0'
+	     cmdString[i] = '\0';
 	   }
 	   i += 1;
 	  }
@@ -58,7 +62,7 @@ int main {
 	    }
 	    i += 1;
 	  }
-	  if (pipe == 1) {
+	  if (piping == 1) {
 	    c = 'z';
 	    i = pipePos + 1;
 	    while (i < MAXLENGTH && c != '\0') {
@@ -74,9 +78,16 @@ int main {
 	    }
 	  }
 
-	  /* Check for one or both binaries in config ( In parallel arrays )
-	  * Else fail
-	  */
+	  /* Check for one or both binaries in config ( In parallel arrays ) */
+	  if ((commandMatch(&cmdString[0])) {
+		  prinf("Command 1 not found\n");
+		  return 1;
+	  }
+
+	  if ((commandMatch(&cmdString[pipePos+2])) {
+		  prinf("Command 2 not found\n");
+		  return 1;
+	  }
 	  
 	  /* Check SHA sum
 	  * Else fail
@@ -94,26 +105,26 @@ int main {
 	  while (i < MAXLENGTH && argNum < argc1) {
 	      if ( cmdString[i] != '\0' && cmdString[i-1] == '\0' )
 	      {
-		argv1[argNum] = &cmdString[i]
-		argcNum += 1;
+		argv1[argNum] = &cmdString[i];
+		argNum += 1;
 	      }
 	    i += 1;
 	  }
-	  if (pipe == 1) {
+	  if (piping == 1) {
 	    argNum = 0;
 	    i = pipePos + 2;
 	    while (i < MAXLENGTH && argNum < argc2) {
 	      if ( cmdString[i] != '\0' && cmdString[i-1] == '\0' )
 	      {
-		argv2[argNum] = &cmdString[i]
-		argcNum += 1;
+		argv2[argNum] = &cmdString[i];
+		argNum += 1;
 	      }
 	      i += 1;
 	    }
 	  }
 
 	  /* If no pipe exev op1 */
-	  if (pipe == 0) {
+	  if (piping == 0) {
 	    /* execve command */
 	  }
 	  else {
@@ -125,19 +136,19 @@ int main {
 	    
 	    if (!isParent){	      
 	      /* ** Child ** */
-	      close(unipipe[1]);
+	      close(uniPipe[1]);
 	      close(0);
-	      dup(unipipe[0]);
-	      close(unipipe[0]);
+	      dup(uniPipe[0]);
+	      close(uniPipe[0]);
 	      /* exeve op2 */
 	      exit(0);
 	    }
 	    else {
 	      /* ** Parent ** */
-	      close(unipipe[0]);
+	      close(uniPipe[0]);
 	      close(1);
-	      dup(unipipe[1]);
-	      close(unipipe[1]);
+	      dup(uniPipe[1]);
+	      close(uniPipe[1]);
 	      /* execve op 1 */
 	      /* wait for child */	      
 	    }

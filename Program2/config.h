@@ -4,8 +4,9 @@
 #define BUFSIZE 4096
 #define COMMANDSIZE 100
 
+const char* file_path = ".shash.config";
 char COMMAND[COMMANDSIZE][BUFSIZE];
-char ENVIRONMENT[BUFSIZE];
+char ENVIRONMENT[ENVIRONMENTSIZE][BUFSIZE];
 int CommandLineIndex = 0;
 int count = 0;
 

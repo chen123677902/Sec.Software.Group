@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
   int argc1 = 0;
   int argc2 = 0;
   int argNum = 0;
+  char *
   char cmdString[MAXLENGTH];
   char c = 'z';	/* scratch char variable */
   
@@ -35,8 +36,6 @@ if (!checkConfigFile()) {
 
 /* While input */
   while (fgets(cmdString, MAXLENGTH, stdin) != NULL) {
-
-	  /* Log requested operation and IDs */
 	  
 	  /* Check for pipe */
 	  int i = 0;

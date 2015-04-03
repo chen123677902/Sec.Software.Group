@@ -20,10 +20,9 @@ int main(int argc, char *argv[]) {
   int argc1 = 0;
   int argc2 = 0;
   int argNum = 0;
-  char *
   char cmdString[MAXLENGTH];
   char c = 'z';	/* scratch char variable */
-  
+
 /* Empty SHASH */
 
 /* Check and Parse config file */
@@ -36,7 +35,7 @@ if (!checkConfigFile()) {
 
 /* While input */
   while (fgets(cmdString, MAXLENGTH, stdin) != NULL) {
-	  
+
 	  /* Check for pipe */
 	  int i = 0;
 	  while (i < MAXLENGTH && cmdString[i] != '\0' && piping == 0) {
@@ -47,7 +46,7 @@ if (!checkConfigFile()) {
 	   }
 	   i += 1;
 	  }
-	  
+
 	  /* get argcs */
 	  i = 0;
 	  while (i < MAXLENGTH && c != '\0') {
@@ -78,34 +77,38 @@ if (!checkConfigFile()) {
 	  }
 
 	  /* Check for one or both binaries in config ( In parallel arrays ) */
-	  if ((commandMatch(&cmdString[0])) {
-		  prinf("Command 1 not found\n");
+	  if (GetCommand(&cmdString[0])) {
+		  printf("Command 1 not found\n");
 		  return 1;
 	  }
 
-	  if ((commandMatch(&cmdString[pipePos+2])) {
-		  prinf("Command 2 not found\n");
+	  if (GetCommand(&cmdString[pipePos+2])) {
+		  printf("Command 2 not found\n");
 		  return 1;
 	  }
-	  
+
 	  /* Check SHA sum
 	  * Else fail
 	  */
-	  
-	  /* Get ENV
-	   * Else fail
-	   */
+
+	  /* Get ENV */
+	  char * env[envPs];
+	  for (i = 0; i < envPs; i++) {
+		  env[i] = &ENVIRONMENT[i][0];
+	  }
+	  env[i] = NULL;
+
 
 	  /* Construct argv arrays */
 	  char * argv1[argc1];
 	  char * argv2[argc2];
-	  
+
 	  i = 1;
 	  while (i < MAXLENGTH && argNum < argc1) {
 	      if ( cmdString[i] != '\0' && cmdString[i-1] == '\0' )
 	      {
-		argv1[argNum] = &cmdString[i];
-		argNum += 1;
+			argv1[argNum] = &cmdString[i];
+			argNum += 1;
 	      }
 	    i += 1;
 	  }
@@ -115,8 +118,8 @@ if (!checkConfigFile()) {
 	    while (i < MAXLENGTH && argNum < argc2) {
 	      if ( cmdString[i] != '\0' && cmdString[i-1] == '\0' )
 	      {
-		argv2[argNum] = &cmdString[i];
-		argNum += 1;
+			argv2[argNum] = &cmdString[i];
+			argNum += 1;
 	      }
 	      i += 1;
 	    }
@@ -124,7 +127,7 @@ if (!checkConfigFile()) {
 
 	  /* If no pipe exev op1 */
 	  if (piping == 0) {
-	    /* execve command */
+	    execve(argv1[0], & argv1[1], env);
 	  }
 	  else {
 	    /* Create pipe */
@@ -132,8 +135,8 @@ if (!checkConfigFile()) {
 	      printf("Error: Create pipe failed");
 	      return -1;
 	    }
-	    
-	    if (!isParent){	      
+
+	    if (!isParent){
 	      /* ** Child ** */
 	      close(uniPipe[1]);
 	      close(0);
@@ -149,8 +152,9 @@ if (!checkConfigFile()) {
 	      dup(uniPipe[1]);
 	      close(uniPipe[1]);
 	      /* execve op 1 */
-	      /* wait for child */	      
+	      /* wait for child */
 	    }
 	  }
   }
+  return 0;
 }

@@ -118,8 +118,10 @@ int checkConfigFile() {
 
 /* restrict Str_Input < mybursize:4096 */
 int GetCommand(char* Str_Input){
+
 	int count = 0;
-	if(strlen(Str_Input)>4096){return -1;}
+	if(strlen(Str_Input)>4096) { return -1; }
+
 	//Serach is fullname inside of commandlist
 	for(count = 0; count < CommandLineIndex; count++) {
 		if(strcmp(Str_Input,COMMAND[count]) == 0) { return 0; }
@@ -136,15 +138,17 @@ int GetCommand(char* Str_Input){
 
 /* find last binary */
 int Lastbinary(char* FullName, char* LastName) {
+
 	int i = 0;
 	char temp[BUFSIZE] = {0};
 	int j = 0;
+
 	while(FullName[j] != '\0') { j++; }
 	//***********************************
-	if(j == 0){return -1;}
+	if(j == 0) { return -1; }
 	//**********************************
 	j--;
-	if(IndexOf('/',FullName)!=-1) {
+	if(IndexOf('/',FullName) != -1) {
 		while(FullName[j] != '/')
 		{
 			temp[i] = FullName[j];

@@ -1,6 +1,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define DEBUG
+#ifdef DEBUG
+#define TRACE(fmt, ...) fprintf(stderr, fmt, __VA_ARGS__)
+#else
+#define TRACE(fmt, ...) do {} while (0)
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>

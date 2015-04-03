@@ -20,21 +20,28 @@ int main(int argc, char *argv[]) {
   int argc1 = 0;
   int argc2 = 0;
   int argNum = 0;
+  int configCheck = 0;
+  char cmd1[MAXLENGTH];
+  char cmd2[MAXLENGTH];
   char cmdString[MAXLENGTH];
   char c = 'z';	/* scratch char variable */
 
 /* Empty SHASH */
 
 /* Check and Parse config file */
-if (!checkConfigFile()) {
-	printf("config check failed");
+configCheck = checkConfigFile();
+if (configCheck ) {
+	TRACE("config check failed: %i", configCheck);
 	return 1;
 }
 
 /* Log */
 
 /* While input */
+printf("SHASH awaits-> ");
   while (fgets(cmdString, MAXLENGTH, stdin) != NULL) {
+
+	  TRACE("Got the Followoing cmdString: %s\n", cmdString);
 
 	  /* Check for pipe */
 	  int i = 0;
@@ -54,12 +61,15 @@ if (!checkConfigFile()) {
 	    if ( isspace(c) ) {
 	      if ( cmdString[i-1] != '\0' )
 	      {
-		argc1 += 1;
+			argc1 += 1;
 	      }
 	      cmdString[i] = '\0';
 	    }
 	    i += 1;
 	  }
+
+	  TRACE("ARGC1: %i\n", argc1);
+
 	  if (piping == 1) {
 	    c = 'z';
 	    i = pipePos + 1;
@@ -74,17 +84,28 @@ if (!checkConfigFile()) {
 	      }
 	      i += 1;
 	    }
+		TRACE("ARGC2: %i", argc2);
+	  }
+
+	  /* Get base cmd names */
+	  strncpy(cmd1, cmdString, MAXLENGTH);
+	  if (piping == 1) {
+		  strncpy(cmd2, &cmdString[pipePos + 2], MAXLENGTH);
 	  }
 
 	  /* Check for one or both binaries in config ( In parallel arrays ) */
-	  if (GetCommand(&cmdString[0])) {
-		  printf("Command 1 not found\n");
+	  if (GetCommand(cmd1)) {
+		  TRACE("Command 1 not found: %s\n", cmd1);
 		  return 1;
 	  }
+	  TRACE("FOUND: %s\n", cmd1);
 
-	  if (GetCommand(&cmdString[pipePos+2])) {
-		  printf("Command 2 not found\n");
-		  return 1;
+	  if (piping == 1) {
+		  if (GetCommand(cmd2)) {
+			TRACE("Command 2 not found: %s\n", cmd2);
+			return 1;
+		  }
+		  TRACE("FOUND: %s\n", cmd2);
 	  }
 
 	  /* Check SHA sum
@@ -98,6 +119,11 @@ if (!checkConfigFile()) {
 	  }
 	  env[i] = NULL;
 
+	  #ifdef DEBUG
+	  for (i = 0; i < envPs; i++) {
+		  TRACE("ENV %i: %s\n", i, env[i]);
+	  }
+	  #endif
 
 	  /* Construct argv arrays */
 	  char * argv1[argc1];
@@ -112,6 +138,20 @@ if (!checkConfigFile()) {
 	      }
 	    i += 1;
 	  }
+	  TRACE("argv1[ %i ] = NULL\n", argNum-1);
+	  argv1[argNum-1] = NULL;
+
+	  #ifdef DEBUG
+	  for (i = 0; i < argc1; i++) {
+		  if (argv1[i] == NULL ) {
+			  TRACE("Done: %p\n", argv1[i]);
+		  }
+		  else {
+			  TRACE("ARGV1[ %i ]: %s\n", i, argv1[i]);
+		  }
+	  }
+	  #endif
+
 	  if (piping == 1) {
 	    argNum = 0;
 	    i = pipePos + 2;
@@ -123,11 +163,35 @@ if (!checkConfigFile()) {
 	      }
 	      i += 1;
 	    }
+		argv2[argNum-1] = NULL;
+		TRACE("argv2[ %i ] = NULL\n", argNum-1);
+
+		#ifdef DEBUG
+		for (i = 0; i < argc2; i++) {
+			if (argv2[i] == NULL ) {
+			  TRACE("Done: %p\n", argv2[i]);
+			}
+			else {
+			  TRACE("ARGV2[ %i ]: %s\n", i, argv2[i]);
+			}
+		}
+		#endif
 	  }
 
 	  /* If no pipe exev op1 */
 	  if (piping == 0) {
-	    execve(argv1[0], & argv1[1], env);
+		#ifdef DEBUG
+			TRACE("EXEC: %s, ", cmd1);
+			for(i = 0; i < argc1 - 1; i++) {
+				TRACE("%s ", argv1[i]);
+			}
+			TRACE("%s", ", ");
+			for(i = 0; i < envPs; i++) {
+				TRACE("%s ", env[i]);
+			}
+		#endif
+
+	    execve(cmd1, & argv1[0], env);
 	  }
 	  else {
 	    /* Create pipe */

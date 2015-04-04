@@ -104,7 +104,16 @@ int checkConfigFile() {
 			CommandLineIndex++;
 			}
 		else if( CommandLineIndex==0 ) {
-			strcpy(ENVIRONMENT[EnvironmentLineIndex], buf);
+			strncpy(ENVIRONMENT[EnvironmentLineIndex], buf, BUFSIZE);
+
+			int i;
+			for (i = 0; i < BUFSIZE; i++) {
+				if(ENVIRONMENT[EnvironmentLineIndex][i] == '\n') {
+					ENVIRONMENT[EnvironmentLineIndex][i] = '\0';
+					break;
+				}
+			}
+
 			envPs++;
 			EnvironmentLineIndex++;
 		}

@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 #define BUFSIZE 4096
 #define COMMANDSIZE 100

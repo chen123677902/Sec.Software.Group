@@ -17,6 +17,8 @@ int main(int argc, char *argv[]) {
   int piping = 0;
   int pipePos = 0;
   int uniPipe[2];
+  int cmd1Index;
+  int cmd2Index;
   int argc1 = 0;
   int argc2 = 0;
   int argNum = 0;
@@ -34,6 +36,7 @@ int main(int argc, char *argv[]) {
 configCheck = checkConfigFile();
 if (configCheck ) {
 	TRACE("config check failed: %i", configCheck);
+	printf("Silent Exit\n");
 	return 1;
 }
 
@@ -96,15 +99,17 @@ printf("SHASH awaits-> ");
 	  }
 
 	  /* Check for one or both binaries in config ( In parallel arrays ) */
-	  if (GetCommand(cmd1)) {
+	  if (cmd1Index = GetCommand(cmd1)) {
 		  TRACE("Command 1 not found: %s\n", cmd1);
+		  printf("Silent Exit\n");
 		  return 1;
 	  }
 	  TRACE("FOUND: %s\n", cmd1);
 
 	  if (piping == 1) {
-		  if (GetCommand(cmd2)) {
+		  if (cmd2Index = GetCommand(cmd2)) {
 			TRACE("Command 2 not found: %s\n", cmd2);
+			printf("Silent Exit\n");
 			return 1;
 		  }
 		  TRACE("FOUND: %s\n", cmd2);
@@ -123,20 +128,31 @@ printf("SHASH awaits-> ");
 	  }
 	  #endif
 
-	  /* Check SHA1 */
+	  /* Gen SHA1 for file 1 */
 	  getSHA(cmd1, sha1);
-	  //printf("cmd1 SHA1: %s\n", sha1);
-	  printf("Digest is: ");
-	  for(i = 0; i < strlen(sha1); i++) printf("%02x", sha1[i]);
-	  printf("\n");
+
+	  /* Gen SHA1 for file 2 */
+	  if (piping == 1) {
+		  getSHA(cmd2, sha2);
+	  }
+
+	  /* Check SHA1 digest */
+	  if (sha1 != strtol(SHA1[cmd1Index], NULL, 16)) {
+		  printf("Silent Exit\n");
+		  return 1;
+		}
 
 	  /* Check SHA2 */
 	  if (piping == 1) {
+	  /* Gen SHA1 for file 2 */
 		  getSHA(cmd2, sha2);
 		  //printf("cmd1 SHA1: %s\n", sha1);
-		  printf("Digest is: ");
-		  for(i = 0; i < strlen(sha1); i++) printf("%02x", sha2[i]);
-		  printf("\n");
+
+		  /* Check SHA1 digest */
+		  if (sha2 != strtol(SHA1[cmd2Index], NULL, 16)) {
+			  printf("Silent Exit\n");
+			  return 1;
+		  }
 	  }
 
 	  /* Construct argv arrays */
@@ -155,8 +171,8 @@ printf("SHASH awaits-> ");
 	      }
 	    i += 1;
 	  }
-	  TRACE("argv1[ %i ] = NULL\n", argNum);
-	  argv1[argNum] = NULL;
+	  TRACE("argv1[ %i ] = NULL\n", argc1);
+	  argv1[argc1] = NULL;
 
 	  #ifdef DEBUG
 	  for (i = 0; i < argc1; i++) {
@@ -213,13 +229,13 @@ printf("SHASH awaits-> ");
 	  else {
 	    /* Create pipe */
 	    if(pipe(uniPipe) == -1) {
-	      printf("Error: Create pipe failed");
+	      TRACE("Error: Create pipe failed: %i", -1);
 	      return -1;
 	    }
 
 		/* Fork child */
 		if (( isParent = fork()) == - 1 ) {
-			printf( "Error: Fork failed" );
+			TRACE( "Error: Fork failed: %i", isParent );
 			return - 1 ;
 		}
 

@@ -27,17 +27,14 @@ int StringMatch(char* ch1, char* ch2){
 }
 
 /* get first address of ENVIRONMENT Array */
-char* GetEnvironment()
-{
+char* GetEnvironment() {
 	return	&ENVIRONMENT[0][0];
 }
-
 
 int checkConfigFile() {
 
   char buf[BUFSIZE] = {0};
   char WIPESATR[BUFSIZE] = {0};
-  char SHA1[BUFSIZE] = {0};
   int SHA1_Break = 0;
   int EnvironmentLineIndex = 0;
   struct stat CheckFileMode;
@@ -86,7 +83,7 @@ int checkConfigFile() {
 			if((SHA1_Break = IndexOf(' ',WIPESATR))>-1){
 				count = 0;
 				for(SHA1_Break = SHA1_Break + 1; SHA1_Break < strlen(WIPESATR); SHA1_Break++){
-					SHA1[count] = WIPESATR[SHA1_Break];
+					SHA1[CommandLineIndex][count] = WIPESATR[SHA1_Break];
 					count++;
 				}
 			}
@@ -95,14 +92,9 @@ int checkConfigFile() {
 			for(count = 0; count < SHA1_Break; count++){
 				COMMAND[CommandLineIndex][count] = WIPESATR[count];
 			}
-			/*
-			///SHA1 check.
-			if(!strcmp(SHA1,EVP(COMMAND[CommandLineIndex]))){
-			return -1;
-			}
-			*/
+
 			CommandLineIndex++;
-			}
+		}
 		else if( CommandLineIndex==0 ) {
 			strncpy(ENVIRONMENT[EnvironmentLineIndex], buf, BUFSIZE);
 
@@ -120,8 +112,8 @@ int checkConfigFile() {
 		//if contain doesn't belong any of situation above. return -1
 		else{return -1;}
 	}
-		if(CommandLineIndex == 0 || EnvironmentLineIndex == 0){
-		return -1;}
+		if(CommandLineIndex == 0 || EnvironmentLineIndex == 0) { return -1; }
+
 	return 0;
 }
 
@@ -133,13 +125,13 @@ int GetCommand(char* Str_Input){
 
 	//Serach is fullname inside of commandlist
 	for(count = 0; count < CommandLineIndex; count++) {
-		if(strcmp(Str_Input,COMMAND[count]) == 0) { return 0; }
+		if(strcmp(Str_Input,COMMAND[count]) == 0) { return count; }
 	}
 	//Serach is lastbinary inside of commandlist
 	for(count = 0; count < CommandLineIndex; count++) {
 		if( MatchLastbinary(COMMAND[count], Str_Input) == 0) {
 		strcpy(Str_Input, COMMAND[count]);
-		return 0;
+		return count;
 		}
 	}
 	return -1;
@@ -207,7 +199,6 @@ int getSHA(char * fileName, char * sha) {
         if (fileStat.st_size > 100){
              EVP_DigestUpdate(&mdctx, buf, 100);
              EVP_DigestUpdate(&mdctx, buf + 100, fileStat.st_size-100);
-             printf("Splitting file.\n");
        	 } else {
              EVP_DigestUpdate(&mdctx, buf, fileStat.st_size);
 	 }

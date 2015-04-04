@@ -185,21 +185,36 @@ int MatchLastbinary(char* CommandList, char* InputCommand) {
 	return StringMatch(temp1,temp2);
 }
 
-//~ int main(int argc,char *argv[])
-//~ {
-	//~ char input[50];
-	//~ int i=0;
-	//~ printf("entry command:");
-	//~ scanf("%s",input);
-	//~ printf("Environment return status : %d\n",checkConfigFile());
-	//~ printf("lines: %d\n",CommandLineIndex);
-	//~ for(i;i<CommandLineIndex;i++){
-		//~ printf("%s\n",COMMAND[i]);
-	//~ }
-//~
-	//~ printf("return CommandMatch status :%d, return input :%s\n",GetCommand(input),input);
-	//~ for(i=0;i<EnvironmentLineIndex;i++){
-		//~ printf("Environment[%d]:%s", i, ENVIRONMENT[i]);
-	//~ }
-	//~ printf("%s",EVP("/bin/cp"));
-//~ }
+int getSHA(char * fileName, char * sha) {
+   EVP_MD_CTX    mdctx;
+   unsigned char md_value[EVP_MAX_MD_SIZE];
+   int           md_len;
+   struct stat   fileStat;
+   int           fd;
+   char          *buf;
+
+        fd=open(fileName,O_RDONLY);
+
+        fstat(fd,&fileStat);
+        buf=malloc(fileStat.st_size);
+        read(fd,buf,fileStat.st_size);
+
+        EVP_MD_CTX_init(&mdctx);
+
+        EVP_DigestInit_ex(&mdctx, EVP_sha1(), NULL);
+
+        /* Demonstrate that we can do this in pieces */
+        if (fileStat.st_size > 100){
+             EVP_DigestUpdate(&mdctx, buf, 100);
+             EVP_DigestUpdate(&mdctx, buf + 100, fileStat.st_size-100);
+             printf("Splitting file.\n");
+       	 } else {
+             EVP_DigestUpdate(&mdctx, buf, fileStat.st_size);
+	 }
+
+        EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
+        EVP_MD_CTX_cleanup(&mdctx);
+
+		strcpy(sha, md_value);
+        return 0;
+}

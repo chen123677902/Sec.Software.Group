@@ -21,6 +21,8 @@ int main(int argc, char *argv[]) {
   int argc2 = 0;
   int argNum = 0;
   int configCheck = 0;
+  unsigned char sha1[MAXLENGTH];
+  unsigned char sha2[MAXLENGTH];
   char cmd1[MAXLENGTH];
   char cmd2[MAXLENGTH];
   char cmdString[MAXLENGTH];
@@ -108,10 +110,6 @@ printf("SHASH awaits-> ");
 		  TRACE("FOUND: %s\n", cmd2);
 	  }
 
-	  /* Check SHA sum
-	  * Else fail
-	  */
-
 	  /* Get ENV */
 	  char * env[envPs];
 	  for (i = 0; i < envPs; i++) {
@@ -124,6 +122,22 @@ printf("SHASH awaits-> ");
 		  TRACE("ENV %i: %s\n", i, env[i]);
 	  }
 	  #endif
+
+	  /* Check SHA1 */
+	  getSHA(cmd1, sha1);
+	  //printf("cmd1 SHA1: %s\n", sha1);
+	  printf("Digest is: ");
+	  for(i = 0; i < strlen(sha1); i++) printf("%02x", sha1[i]);
+	  printf("\n");
+
+	  /* Check SHA2 */
+	  if (piping == 1) {
+		  getSHA(cmd2, sha2);
+		  //printf("cmd1 SHA1: %s\n", sha1);
+		  printf("Digest is: ");
+		  for(i = 0; i < strlen(sha1); i++) printf("%02x", sha2[i]);
+		  printf("\n");
+	  }
 
 	  /* Construct argv arrays */
 	  char * argv1[argc1 + 1];
@@ -141,7 +155,7 @@ printf("SHASH awaits-> ");
 	      }
 	    i += 1;
 	  }
-	  TRACE("argv1[ %i ] = NULL\n", argNum-1);
+	  TRACE("argv1[ %i ] = NULL\n", argNum);
 	  argv1[argNum] = NULL;
 
 	  #ifdef DEBUG
@@ -166,8 +180,8 @@ printf("SHASH awaits-> ");
 	      }
 	      i += 1;
 	    }
-		argv2[argNum] = NULL;
-		TRACE("argv2[ %i ] = NULL\n", argNum-1);
+		argv2[argNum+1] = NULL;
+		TRACE("argv2[ %i ] = NULL\n", argNum + 1);
 
 		#ifdef DEBUG
 		for (i = 0; i < argc2; i++) {
@@ -203,6 +217,7 @@ printf("SHASH awaits-> ");
 	      return -1;
 	    }
 
+		/* Fork child */
 		if (( isParent = fork()) == - 1 ) {
 			printf( "Error: Fork failed" );
 			return - 1 ;
@@ -225,10 +240,11 @@ printf("SHASH awaits-> ");
 	      close(uniPipe[1]);
 	      execve(cmd1, & argv1[0], env);
 	      /* Wait for Child to terminate */
-		  int childStatus ;
+		  int childStatus;
 		  waitpid( isParent, & childStatus, 0 );
 	    }
 	  }
   }
+
   return 0;
 }

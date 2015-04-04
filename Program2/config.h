@@ -19,6 +19,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <openssl/evp.h>
 
 #define BUFSIZE 4096
 #define COMMANDSIZE 100
@@ -49,5 +50,8 @@ int Lastbinary(char* FullName, char* LastName);
 
 /* searching if thHre is a command match the last binary from command list */
 int MatchLastbinary(char* CommandList, char* InputCommand);
+
+/* Generate and return SHA1 sum for given file name */
+int getSHA(char * fileName, char * sha);
 
 #endif

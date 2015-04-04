@@ -132,30 +132,35 @@ printf("SHASH awaits-> ");
 
 	  /* Gen SHA1 for file 1 */
 	  getSHA(cmd1, sha1);
+	  TRACE("sha1: %s\n", sha1);
 
 	  /* Gen SHA1 for file 2 */
 	  if (piping == 1) {
 		  getSHA(cmd2, sha2);
+		  TRACE("sha2: %s\n", sha1);
 	  }
 
-//	  /* Check SHA1 digest */
-//	  if (sha1 != strtol(SHA1[cmd1Index], NULL, 16)) {
-//		  printf("Silent Exit\n");
-//		  return 1;
-//		}
-//
-//	  /* Check SHA2 */
-//	  if (piping == 1) {
-//	  /* Gen SHA1 for file 2 */
-//		  getSHA(cmd2, sha2);
-//		  //printf("cmd1 SHA1: %s\n", sha1);
-//
-//		  /* Check SHA1 digest */
-//		  if (sha2 != strtol(SHA1[cmd2Index], NULL, 16)) {
-//			  printf("Silent Exit\n");
-//			  return 1;
-//		  }
-//	  }
+
+	  /* Check SHA1 digest */
+	  if ( strcmp( sha1, SHA1[cmd1Index] ) ) {
+		  TRACE("sha1 doesn't match: %s\n", SHA1[cmd1Index]);
+		  printf("Silent Exit\n");
+		  return 1;
+		}
+
+	  /* Check SHA2 */
+	  if (piping == 1) {
+	  /* Gen SHA1 for file 2 */
+		  getSHA(cmd2, sha2);
+		  //printf("cmd1 SHA1: %s\n", sha1);
+
+		  /* Check SHA1 digest */
+		  if (strcmp( sha2, SHA1[cmd2Index] ) ) {
+			  TRACE("sha1 doesn't match: %s\n", SHA1[cmd2Index]);
+			  printf("Silent Exit\n");
+			  return 1;
+		  }
+	  }
 
 	  /* Construct argv arrays */
 	  char * argv1[argc1 + 1];

@@ -183,6 +183,7 @@ int getSHA(char * fileName, char * sha) {
    struct stat   fileStat;
    int           fd;
    char          *buf;
+   int 	i;
 
         fd=open(fileName,O_RDONLY);
 
@@ -205,6 +206,7 @@ int getSHA(char * fileName, char * sha) {
         EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
         EVP_MD_CTX_cleanup(&mdctx);
 
-		strcpy(sha, md_value);
+		for(i = 0; i < md_len; i++) snprintf(&sha[i*2], 100, "%02x",md_value[i]);
+		//sprintf(sha,"%02x",md_value);
         return 0;
 }

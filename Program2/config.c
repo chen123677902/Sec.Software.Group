@@ -51,7 +51,6 @@ int checkConfigFile() {
 
   if(lstat(file_path,&CheckFileMode) < 0)
   {
-    printf("lstat error!\n");
     printf("silent exit\n");
     return -1;
   }

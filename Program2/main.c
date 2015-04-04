@@ -99,7 +99,8 @@ printf("SHASH awaits-> ");
 	  }
 
 	  /* Check for one or both binaries in config ( In parallel arrays ) */
-	  if (cmd1Index = GetCommand(cmd1)) {
+	  cmd1Index = GetCommand(cmd1);
+	  if (cmd1Index == -1) {
 		  TRACE("Command 1 not found: %s\n", cmd1);
 		  printf("Silent Exit\n");
 		  return 1;
@@ -107,12 +108,13 @@ printf("SHASH awaits-> ");
 	  TRACE("FOUND: %s\n", cmd1);
 
 	  if (piping == 1) {
-		  if (cmd2Index = GetCommand(cmd2)) {
-			TRACE("Command 2 not found: %s\n", cmd2);
+		  cmd2Index = GetCommand(cmd2);
+		  if (cmd2Index == -1) {
+			TRACE("Command 2 not found: %s %i\n", cmd2, cmd2Index);
 			printf("Silent Exit\n");
 			return 1;
 		  }
-		  TRACE("FOUND: %s\n", cmd2);
+		  TRACE("FOUND: %s %i\n", cmd2, cmd2Index);
 	  }
 
 	  /* Get ENV */
@@ -136,24 +138,24 @@ printf("SHASH awaits-> ");
 		  getSHA(cmd2, sha2);
 	  }
 
-	  /* Check SHA1 digest */
-	  if (sha1 != strtol(SHA1[cmd1Index], NULL, 16)) {
-		  printf("Silent Exit\n");
-		  return 1;
-		}
-
-	  /* Check SHA2 */
-	  if (piping == 1) {
-	  /* Gen SHA1 for file 2 */
-		  getSHA(cmd2, sha2);
-		  //printf("cmd1 SHA1: %s\n", sha1);
-
-		  /* Check SHA1 digest */
-		  if (sha2 != strtol(SHA1[cmd2Index], NULL, 16)) {
-			  printf("Silent Exit\n");
-			  return 1;
-		  }
-	  }
+//	  /* Check SHA1 digest */
+//	  if (sha1 != strtol(SHA1[cmd1Index], NULL, 16)) {
+//		  printf("Silent Exit\n");
+//		  return 1;
+//		}
+//
+//	  /* Check SHA2 */
+//	  if (piping == 1) {
+//	  /* Gen SHA1 for file 2 */
+//		  getSHA(cmd2, sha2);
+//		  //printf("cmd1 SHA1: %s\n", sha1);
+//
+//		  /* Check SHA1 digest */
+//		  if (sha2 != strtol(SHA1[cmd2Index], NULL, 16)) {
+//			  printf("Silent Exit\n");
+//			  return 1;
+//		  }
+//	  }
 
 	  /* Construct argv arrays */
 	  char * argv1[argc1 + 1];
